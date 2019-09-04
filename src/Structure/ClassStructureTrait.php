@@ -96,11 +96,16 @@ trait ClassStructureTrait
     {
         $result = new \stdClass();
         $schema = static::schema();
+        $classname = $schema->getObjectItemClass();
+        $classReference = (class_exists($classname)) ? new $classname() : new \stdClass();
         $properties = $schema->getProperties();
         if (null !== $properties) {
             foreach ($properties->getDataKeyMap() as $propertyName => $dataName) {
                 $value = $this->$propertyName;
-                if ((null !== $value) || array_key_exists($propertyName, $this->__arrayOfData)) {
+                if (
+                    (null !== $value || ($value === null && property_exists($classReference, $propertyName)))
+                    || array_key_exists($propertyName, $this->__arrayOfData)
+                ) {
                     $result->$dataName = $value;
                 }
             }
